@@ -41,21 +41,22 @@ window.Snd = (function () {
   const pluck = (f, t, v) => { const o = AC.createOscillator(), fl = AC.createBiquadFilter(), g = AC.createGain(); o.type = 'sawtooth'; o.frequency.value = f; fl.type = 'lowpass'; fl.frequency.setValueAtTime(2600, t); fl.frequency.exponentialRampToValueAtTime(400, t + 0.14); env(g, t, 0.004, 0.16, v); o.connect(fl); fl.connect(g); g.connect(bMusic); o.start(t); o.stop(t + 0.25); };
   // el escape: «tic» agudo y «tac» grave, clic seco mas un pequeño timbre de laton
   function tick(t, tac, v) { const f = tac ? 1750 : 2500; noise(t, 0.018, v * 0.9, 'bandpass', f * 1.6, 3, bTick); osc('sine', f, t, 0.001, 0.05, v * 0.5, bTick); osc('sine', f * 2.76, t, 0.001, 0.025, v * 0.22, bTick); noise(t, 0.03, v * 0.25, 'lowpass', 500, 1, bTick); }
-  // ---------------------------------------------------------------- partitura (re menor: Rem | Sib | Fa | Do, y un puente Solm | Rem | Sib | La)
-  const CH = { Dm: ['D', 'F', 'A'], Bb: ['Bb', 'D', 'F'], F: ['F', 'A', 'C'], C: ['C', 'E', 'G'], Gm: ['G', 'Bb', 'D'], A: ['A', 'C#', 'E'] };
-  const PROG = [['Dm', 'Bb', 'F', 'C'], ['Dm', 'Bb', 'F', 'C'], ['Gm', 'Dm', 'Bb', 'A'], ['Dm', 'Bb', 'F', 'C']];
-  // melodia de caja de musica en corcheas, por compas de 4/4 (notas con octava; '.' = silencio)
+  // ---------------------------------------------------------------- partitura (re dorico, con aire de laboratorio: Rem9 | Sol | Sibmaj7 | Do, y un puente Fa | Sol | Sib | La)
+  // el Sol mayor (si natural) y el mi sobre Sib (cuarta aumentada) dan el color de "curiosidad"; la cuarta nota de cada acorde es su tension y solo la usan el colchon y los pings
+  const CH = { Dm: ['D', 'F', 'A', 'E'], G: ['G', 'B', 'D', 'A'], Bb: ['Bb', 'D', 'F', 'A'], F: ['F', 'A', 'C', 'G'], C: ['C', 'E', 'G', 'D'], A: ['A', 'C#', 'E', 'B'] };
+  const PROG = [['Dm', 'G', 'Bb', 'C'], ['Dm', 'G', 'Bb', 'C'], ['F', 'G', 'Bb', 'A'], ['Dm', 'G', 'Bb', 'C']];
+  // melodia de caja de musica en corcheas, por compas de 4/4 (notas con octava; '.' = silencio): frases que suben y se quedan en el aire, como una pregunta
   const MEL = [
-    ['D5', '.', 'A5', 'F5', 'D5', '.', 'F5', 'A5', 'Bb5', '.', 'F5', 'D5', 'Bb4', '.', 'D5', 'F5', 'C6', '.', 'A5', 'F5', 'C5', '.', 'F5', 'A5', 'G5', '.', 'E5', 'C5', 'E5', 'G5', 'C6', '.'],
-    ['D6', '.', 'A5', '.', 'F5', 'A5', 'D6', 'F6', 'D6', '.', 'Bb5', '.', 'F5', 'Bb5', 'D6', '.', 'C6', 'A5', 'F5', 'A5', 'C6', '.', 'F6', '.', 'E6', 'C6', 'G5', 'C6', 'E6', '.', 'D6', 'C6'],
-    ['Bb5', '.', 'G5', 'D5', 'G5', 'Bb5', 'D6', '.', 'A5', '.', 'F5', 'D5', 'F5', 'A5', 'D6', '.', 'Bb5', 'D6', 'F6', 'D6', 'Bb5', '.', 'F5', '.', 'A5', 'C#6', 'E6', '.', 'C#6', 'A5', 'E5', '.'],
-    ['D5', 'F5', 'A5', 'D6', 'A5', 'F5', 'D5', '.', 'Bb4', 'D5', 'F5', 'Bb5', 'F5', 'D5', 'Bb4', '.', 'C5', 'F5', 'A5', 'C6', 'A5', 'F5', 'C5', '.', 'C5', 'E5', 'G5', 'C6', 'E6', '.', 'D6', '.']];
+    ['D5', '.', 'A5', '.', 'E6', '.', 'D6', 'A5', 'B5', '.', 'G5', '.', 'D6', '.', 'B5', 'G5', 'A5', '.', 'F5', '.', 'E6', '.', 'D6', 'Bb5', 'G5', '.', 'E5', 'G5', 'C6', '.', 'D6', '.'],
+    ['D5', 'F5', 'A5', 'E6', '.', 'D6', 'A5', 'F5', 'G5', 'B5', 'D6', 'G6', '.', 'D6', 'B5', '.', 'Bb5', 'D6', 'E6', 'F6', '.', 'E6', 'D6', 'A5', 'C6', 'G5', 'E5', 'G5', 'C6', 'D6', 'E6', '.'],
+    ['A5', '.', 'C6', '.', 'F6', '.', 'C6', 'A5', 'B5', '.', 'D6', '.', 'G6', '.', 'D6', 'B5', 'D6', '.', 'Bb5', '.', 'E6', '.', 'F6', 'D6', 'C#6', '.', 'A5', 'E5', 'A5', 'C#6', 'E6', '.'],
+    ['D6', 'A5', 'E5', 'A5', 'D6', '.', 'E6', '.', 'D6', 'B5', 'G5', 'B5', 'D6', '.', 'G6', '.', 'F6', 'D6', 'Bb5', 'D6', 'E6', '.', 'A5', '.', 'G5', 'C6', 'E6', '.', 'D6', '.', '.', '.']];
   const pn = s => hz(s.slice(0, -1), +s.slice(-1)); let tr = 1, gbpm = 112; const mz = (n, o) => hz(n, o) * tr, AREA = [[0, 112], [-3, 104], [1, 140], [5, 92], [-2, 132], [3, 120], [-5, 134]];
   function sched() {
     if (!AC) return; const now = AC.currentTime; if (nextT < now - 0.5) nextT = now + 0.05;
     // estado: poca cuerda cierra el filtro y hace cojear el tic-tac; peligro sube la capa de cuerdas
     const low = st.bat < 25 && !st.dead && scene === 'game', tgtF = st.dead ? 500 : low ? 1500 : 9000; mFilter.frequency.setTargetAtTime(tgtF, now, 0.4);
-    intens += ((scene === 'game' ? st.danger : 0) - intens) * 0.04; bMusic.gain.setTargetAtTime(muted ? 0 : (scene === 'intro' ? 0.36 : 0.5) * vM, now, 0.3); bTick.gain.setTargetAtTime(muted ? 0 : (st.dead ? 0.0 : scene === 'game' ? 0.6 : 0.32) * vS, now, st.dead ? 0.9 : 0.2); bSfx.gain.setTargetAtTime(muted ? 0 : 0.9 * vS, now, 0.05);
+    intens += ((scene === 'game' ? st.danger : 0) - intens) * 0.04; bMusic.gain.setTargetAtTime(muted ? 0 : (scene === 'intro' ? 0.5 : 0.7) * vM, now, 0.3); bTick.gain.setTargetAtTime(muted ? 0 : (st.dead ? 0.0 : scene === 'game' ? 0.6 : 0.32) * vS, now, st.dead ? 0.9 : 0.2); bSfx.gain.setTargetAtTime(muted ? 0 : 0.9 * vS, now, 0.05);
     const bpm = scene === 'game' ? gbpm : scene === 'intro' ? 76 : 88, e8 = 30 / bpm;   // duracion de una corchea
     while (nextT < now + 0.14) {
       const t = nextT, s8 = step % 8, bar = Math.floor(step / 8) % 16, sec = Math.floor(bar / 4), ch = CH[PROG[sec][bar % 4]], game = scene === 'game', full = game || scene === 'end';
@@ -74,6 +75,9 @@ window.Snd = (function () {
           if ((ar === 6 || ar === 2) && s8 === 4) metal(t, 760, 0.035, 0.5, bMusic); if (ar === 4 && s8 % 2 === 0) osc('sawtooth', mz(ch[1], 5), t, 0.02, e8 * 0.8, 0.012, bMusic, mz(ch[1], 5) * 1.03); }
         if (s8 === 0) osc('sine', 95, t, 0.003, 0.16, 0.2, bMusic, 42); if (s8 === 4) noise(t, 0.07, 0.07, 'bandpass', 1900, 1.2, bMusic); if (s8 % 2 === 1) noise(t, 0.02, 0.03, 'highpass', 6000, 1, bMusic); }
       if (intens > 0.05 && game) { pluck(mz(ch[[0, 2, 1, 2, 0, 2, 1, 2][s8]], 3), t, 0.09 * intens); if (intens > 0.45 && (s8 === 2 || s8 === 6 || s8 === 7)) thudM(t, 0.16 * intens); if (intens > 0.45 && s8 === 0) pad(ch.map(n => mz(n, 5)), t, e8 * 8, 0.012 * intens); }
+      // laboratorio: un "contador" de pitidos muy suaves que va midiendo algo, y un ping de cristal que sube y se queda sonando
+      if (scene !== 'intro') { if (bar % 2 === 1 && (s8 === 1 || s8 === 2 || s8 === 5)) osc('sine', mz(ch[2], 7), t, 0.002, 0.05, full ? 0.012 : 0.016, bMusic); if (bar % 4 === 2 && s8 === 3) osc('sine', mz(ch[2], 7), t + e8 / 2, 0.002, 0.05, 0.012, bMusic);
+        if (bar % 2 === 0 && s8 === 6) { osc('sine', mz(ch[3], 6), t, 0.006, 1.5, 0.02, rev); osc('sine', mz(ch[3], 7), t + e8, 0.006, 1.8, 0.012, rev); } }
       if (scene === 'title' && s8 === 0 && bar % 4 === 0) metal(t, mz(ch[0], 5), 0.03, 3, bMusic);
       // ambiente del taller: de vez en cuando, algo metalico cruje lejos
       if (game && t > ambT) { ambT = t + rnd(7, 16); const f = rnd(160, 420); if (Math.random() < 0.5) metal(t + 0.1, f, 0.02, 1.2, rev); else { osc('sine', f, t, 0.2, 0.9, 0.018, rev, f * rnd(0.85, 1.2)); } }
