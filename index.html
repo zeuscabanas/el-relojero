@@ -340,7 +340,7 @@ function buildWorld() {
     [[0, 1, 0, 1 - f + 0.004], [0, uL, 1 - f, 1], [uR, 1, 1 - f, 1], [uL, s0 - 0.004, 1 - f, 1 - fr - 0.006], [s1 + 0.004, uR, 1 - f, 1 - fr - 0.006]].forEach(q => g.add(rc(q[0], q[1], q[2], q[3])));
     for (let i = -3; i <= 3; i++) { const tint = Math.abs(i) === 3 ? 0xffffff : 0x8a6038; [[uL, uR, 1 - fr, 1], [s0, s1, 1 - f, 1 - fr + 0.002]].forEach(q => { const k1 = rc(q[0], q[1], q[2], q[3], tint); k1.material.side = THREE.DoubleSide; k1.position.y -= yK; k1.position.z = i * 0.022; key.add(k1); }); }
     key.position.set(0, yK, 0.02); g.add(key); g.position.set(x, y, z); S.add(g); g.userData.key = key; return g; };
-  const station = (x, y, bat) => { paintBox('b_ped_f', 'b_ped_t', 2.25, 0.3, 1.5, x, y - 0.02, 0.1);
+  const station = (x, y, bat) => { paintBox('b_ped_f', 'b_ped_t', 2.25, 0.3, 1.5, x, y - 0.02, 0.1); solids.push({ x0: x - 1.06, x1: x + 1.06, y0: y - 0.05, y1: y + 0.26, safe: true, step: true });
     const ring = new THREE.Mesh(new THREE.RingGeometry(0.55, 0.78, 36), new THREE.MeshBasicMaterial({ color: 0xffb04a, transparent: true, opacity: 0.55 })); ring.rotation.x = -Math.PI / 2; ring.position.set(x, y + 0.272, 0.1); ring.material.blending = THREE.AdditiveBlending; ring.material.depthWrite = false; S.add(ring);
     const st = { x: x, y: y, bat: !!bat, on: !!bat, ring: ring, gl: glow(x, y + 1.5, -0.1, 4.6, 0.0) };
     if (bat) st.cOn = keyCard('est_bateria', 3.1, 0.222, x, y + 0.2, -0.22, 0.175, 0.24, 0.76, 0.42, 0.58); else { st.cOff = card('est_off', 2.75, x, y + 0.2, -0.22); st.cOn = keyCard('est_on', 2.75, 0.234, x, y + 0.2, -0.22, 0.197, 0.14, 0.865, 0.4, 0.6); st.cOn.visible = false; } st.key = st.cOn.userData.key;
@@ -1139,7 +1139,7 @@ function step(dt) {
   if (dashT > 0) { if (G.ab.da) for (const f of foes) if (f.alive && f.hitBy !== 'd' + dashId && Math.abs(f.x - P.x) < f.r + 0.6 && Math.abs(f.y - P.y - 0.7) < f.r + 0.9) { f.hitBy = 'd' + dashId; hitFoe(f, { dmg: 1 + G.up.dmg }); }
     dashT -= dt; P.vy = 0; P.vx = P.face * DASHV; if (Math.random() < 0.7) puff(P.x - P.face * 0.3, P.y + 0.3 + Math.random() * 0.8, 1, 0xffe0a0, 0.5); if (dashT <= 0) P.vx = P.face * SPEED; }
   P.x += P.vx * dt;
-  for (const s of solids) if (!s.gone && !s.oneWay && P.x + PW / 2 > s.x0 && P.x - PW / 2 < s.x1 && P.y + PH > s.y0 + 0.02 && P.y < s.y1 - 0.06) { if (P.vx > 0 || (P.vx === 0 && P.x < (s.x0 + s.x1) / 2)) P.x = s.x0 - PW / 2; else P.x = s.x1 + PW / 2; P.vx = 0; }
+  for (const s of solids) if (!s.gone && !s.oneWay && P.x + PW / 2 > s.x0 && P.x - PW / 2 < s.x1 && P.y + PH > s.y0 + 0.02 && P.y < s.y1 - 0.06) { if (s.step && s.y1 - P.y < 0.4 && P.vy >= -0.5) { P.y = s.y1 + 0.001; continue; } if (P.vx > 0 || (P.vx === 0 && P.x < (s.x0 + s.x1) / 2)) P.x = s.x0 - PW / 2; else P.x = s.x1 + PW / 2; P.vx = 0; }
   const py = P.y, wasG = P.ground, vyIn = P.vy; P.y += P.vy * dt; P.ground = false; let on = null;
   for (const s of solids) if (!s.gone && P.x + PW / 2 > s.x0 + 0.02 && P.x - PW / 2 < s.x1 - 0.02 && P.y + PH > s.y0 && P.y < s.y1) {
     if (P.vy <= 0 && py >= s.y1 - 0.25 - Math.abs(s.dy || 0)) { P.y = s.y1; P.vy = 0; P.ground = true; on = s; }
