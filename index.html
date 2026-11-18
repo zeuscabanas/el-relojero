@@ -1109,9 +1109,14 @@ function step(dt) {
     if (dead <= 0) { deadB = false; const st = stations[lastSt] && stations[lastSt].on ? stations[lastSt] : null; P.x = st ? st.x : 2.2; P.y = (st ? st.y : 0) + 0.3; P.vx = P.vy = 0; bat = bmax(); inv = 1.5; $('msg').classList.add('hidden'); camTY = P.y; flash(0.35); squash(0.6, 1.4); puff(P.x, P.y + 0.9, 14, 0xffd76a, 4.5, 3); Snd.play('full'); Snd.play('ratchet', 40); } }
   if (dead <= 0) G.t += dt; inv -= dt; charging = false;
   if (dead <= 0) {
-    stations.forEach((st, i) => { if (!(P.ground && Math.abs(P.x - st.x) < 0.95 && P.y - st.y > -0.2 && P.y - st.y < 0.5)) return;
+    stations.forEach((st, i) => { const dxS = Math.abs(P.x - st.x), dyS = P.y - st.y;
+      // la primera vez que ve una estacion en marcha, Tic explica para que sirve
+      if (st.on && !G.seen.est && P.ground && !dlg && dxS < 3.4 && dyS > -0.3 && dyS < 1 && !(window.__TEST && !window.__TUT)) { G.seen.est = true; save(); talk(TR('Tic, el búho'), 'npc_buho', [TR('¿Ves esa máquina con la llave girando? Es una estación de cuerda.'), TR('Súbete a su placa y te da cuerda hasta arriba. Y guarda la partida: si te quedas sin cuerda, vuelves a la última estación por la que pasaste.')]); }
+      // punto de control: basta con pasar cerca, aunque sea saltando
+      if (st.on && lastSt !== i && dxS < 1.6 && dyS > -0.4 && dyS < 3.4) { lastSt = i; G.st = i; save(); Snd.play('save'); toast(TR('Punto de control guardado: si te quedas sin cuerda, vuelves aquí'), 3200); puff(st.x, st.y + 0.5, 12, 0xffd76a, 3.6, 2.4); st.kick = 0; }
+      if (!(P.ground && dxS < 0.95 && dyS > -0.2 && dyS < 0.5)) return;
       if (!st.on) { if (T > (st.msg || 0)) { st.msg = T + 5; toast(TR('Estación parada: el movimiento no llega. Sigue la correa y monta los engranajes que faltan'), 3200); } }
-      if (st.on) { charging = true; if (lastSt !== i) { lastSt = i; G.st = i; save(); Snd.play('save'); toast(TR('Partida guardada'), 1500); } } });
+      if (st.on) { charging = true; if (T > (st.kick || 0)) { st.kick = T + 6; if (bat < bmax()) { bat = Math.min(bmax(), bat + 30); Snd.play('ratchet', bat); puff(P.x, P.y + 0.8, 6, 0xffd76a, 3, 2); } } } });
     if (charging) { if (bat < bmax()) { tick -= dt; if (tick <= 0) { tick = 0.065; Snd.play('ratchet', bat); } bat = Math.min(bmax(), bat + CHARGE * dt); if (bat >= bmax()) Snd.play('full'); } } else bat -= DRAIN * dt;
     if (inv <= 0 && dashT <= 0) for (const f of foes) { if (!f.alive || (f.type === 'jefe' && f.st !== 'run') || (f.type === 'rodillo' && f.st !== 'run') || (f.type === 'reina' && f.st !== 'dive')) continue; const qx = Math.max(P.x - PW / 2, Math.min(P.x + PW / 2, f.x)), qy = Math.max(P.y, Math.min(P.y + PH, f.y)); if (Math.hypot(qx - f.x, qy - f.y) < f.r) { hurt(f.st === 'charge' ? 24 : f.st === 'run' ? (f.type === 'rodillo' ? 17 : 22) : f.type === 'reina' ? 15 : f.dmg, P.x < f.x ? -1 : 1, f); break; } }
     if (bat <= 0) { logEv('muerte', inv > 0.8 ? 'por golpe' : 'sin cuerda'); bat = 0; dead = DEADT; deadB = false; G.falls++; Snd.play('die'); stop = 0.12; flash(0.2); }
